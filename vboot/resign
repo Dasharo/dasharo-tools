@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
+source "${SCRIPT_DIR}/../common.sh"
+
+usage() {
+cat <<EOF
+
+This script resigns (for Verified Boot) already signed INPUT_ROM with keys from
+KEYS_DIRECTORY for Verified Boot. Please refer to the Dasharo documentation for
+more information:
+https://docs.dasharo.com/common-coreboot-docs/vboot_signing/
+
+Usage: $0 INPUT_ROM KEYS_DIRECTORY
+
+  Arguments:
+    INPUT_ROM          path to the input firmware file
+    KEYS_DIRECTORY     path to directory where generated keys should be located
+
+Example usage:
+    $0 protectli_vault_cml_v1.0.16.rom keys
+EOF
+  exit 0
+}
+
+INPUT_ROM="$(readlink -f $1)"
+KEYS_DIRECTORY="$(readlink -f $2)"
+OUTPUT_ROM="${INPUT_ROM%.*}_resigned.rom"
+
+[ -z "$INPUT_ROM" ] && echo "INPUT_ROM not given" && usage
+[ -z "$KEYS_DIRECTORY" ] && echo "KEYS_DIRECTORY not given" && usage
+
+docker run --rm -it -v $PWD:$PWD -w $PWD \
+  ghcr.io/dasharo/dasharo-sdk:latest \
+  /vboot/scripts/image_signing/sign_firmware.sh \
+  "$INPUT_ROM" \
+  "$KEYS_DIRECTORY" \
+  "$OUTPUT_ROM"
+
+errorCheck "Failed to resign firmware file"
+
+echo "The $INPUT_ROM was resigned and saved as: $OUTPUT_ROM"

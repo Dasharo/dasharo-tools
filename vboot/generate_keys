@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
+source "${SCRIPT_DIR}/../common.sh"
+
+usage() {
+cat <<EOF
+
+This script generates keys for Verified Boot in the KEYS_DIRECTORY. Please refer
+to the Dasharo documentation for more information:
+https://docs.dasharo.com/common-coreboot-docs/vboot_signing/
+
+Usage: $0 KEYS_DIRECTORY
+
+  Arguments:
+    KEYS_DIRECTORY     path to directory where generated keys should be located
+
+Example usage:
+    $0 keys
+EOF
+  exit 0
+}
+
+KEYS_DIRECTORY="$(readlink -f $1)"
+
+[ -z "$KEYS_DIRECTORY" ] && echo "KEYS_DIRECTORY not given" && usage
+
+docker run --rm -it -v $PWD:$PWD -w $PWD \
+  ghcr.io/dasharo/dasharo-sdk:latest \
+  /vboot/scripts/keygeneration/create_new_keys.sh --output "$KEYS_DIRECTORY"
+
+errorCheck "Failed to generate keys"
+
+echo "The Verified Boot keys were generated into following directory: $KEYS_DIRECTORY"
