@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+HWDB_FILE="/etc/udev/hwdb.d/60-keyboard.hwdb"
+PRODUCT_NAME=$(dmidecode -s baseboard-product-name)
+MANUFACTURER="$(dmidecode -s baseboard-manufacturer)"
+
+echo "Found $MANUFACTURER $PRODUCT_NAME"
+
+echo "evdev:atkbd:dmi:bvn*:bvr*:svn${MANUFACTURER}:pn${PRODUCT_NAME}:*" > "$HWDB_FILE"
+echo "        KEYBOARD_KEY_f7=191" >> "$HWDB_FILE"
+echo "        KEYBOARD_KEY_f8=191" >> "$HWDB_FILE"
+
+systemd-hwdb update
+udevadm trigger
+
+echo "The $HWDB_FILE has been created successfully."
+echo "The touchpad FN+F1 switch should be fixed after reboot."
+echo "The system will reboot in 10 seconds. Press Ctrl+C to abort."
+
+sleep 10
+
+systemctl reboot
