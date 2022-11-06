@@ -1,0 +1,49 @@
+#!/bin/bash
+
+# A script to install a service that enables SATA link power management on
+# each boot.
+# Enables suspend mode while a SATA SSD is attached to the system.
+
+# Location to the script that shall be executed on each boot.
+SCRIPT="/usr/local/bin/enable_dipm.sh"
+SERVICE="/etc/systemd/system/enable_dipm.service"
+
+if [ "$EUID" -ne 0 ]
+  then echo "This script needs to be executed as root."
+  exit
+fi
+
+echo "#!/bin/bash
+
+SCSI_HOST=/sys/class/scsi_host
+
+if [ ! -d \$SCSI_HOST ]; then
+		exit
+fi
+
+if [ -z '\$(ls -A \$SCSI_HOST)' ]; then
+		exit
+fi
+
+for host in \$SCSI_HOST/host*; do
+		echo 'med_power_with_dipm' > \$host/link_power_management_policy
+done
+" > $SCRIPT
+
+chmod +x $SCRIPT
+
+echo "
+[Unit]
+Description=Enable SATA DIPM
+After=multi-user.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/enable_dipm.sh
+
+[Install]
+WantedBy=multi-user.target
+" > $SERVICE
+
+systemctl daemon-reload
+systemctl enable --now enable_dipm.service
