@@ -21,7 +21,7 @@ echo "
 headset-mode-no-hp-mic
 
 [pincfg]
-0x19 0x03a1112
+0x19 0x03a11120
 " > $PATCH
 
 echo "
