@@ -27,7 +27,7 @@ KEYS_DIRECTORY="$(readlink -f $1)"
 [ -z "$KEYS_DIRECTORY" ] && echo "KEYS_DIRECTORY not given" && usage
 
 docker run --rm -it -v $PWD:$PWD -w $PWD \
-  ghcr.io/dasharo/dasharo-sdk:latest \
+  ghcr.io/dasharo/dasharo-sdk:v1.1.0 \
   /vboot/scripts/keygeneration/create_new_keys.sh --output "$KEYS_DIRECTORY"
 
 errorCheck "Failed to generate keys"
