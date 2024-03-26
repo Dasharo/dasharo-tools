@@ -1,0 +1,35 @@
+#!/bin/bash
+
+# A small parser for Vboot v2 workbuffer
+
+cbmem -r 78007343 > /tmp/vbnv.bin 2> /dev/null
+
+if [ $? -ne 0 ]; then
+	echo "Could not read Vboot workbuf!"
+	exit 1
+fi
+
+recovery_reason=$(dd if=/tmp/vbnv.bin bs=1 count=1 skip=$((0x194)) 2> /dev/null | xxd -p)
+if [ $recovery_reason -ne "00" ]; then
+	echo "Recovery boot mode"
+	echo -en "Recovery reason:\t0x"
+	echo $recovery_reason
+else
+	echo "Normal boot mode"
+	cur_fw_slot=$(($(dd if=/tmp/vbnv.bin bs=1 count=4 skip=$((0x19c)) 2> /dev/null | xxd -p)))
+	echo -en "FW slot:\t"
+	case $cur_fw_slot in
+
+		0)
+			echo "A"
+			;;
+		1)
+			echo "B"
+			;;
+		*)
+			echo "Unknown!"
+			;;
+
+	esac
+fi
+
