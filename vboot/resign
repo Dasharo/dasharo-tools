@@ -33,7 +33,7 @@ OUTPUT_ROM="${INPUT_ROM%.*}_resigned.rom"
 
 docker run --rm -it -v $PWD:$PWD -w $PWD \
   -v $KEYS_DIRECTORY:$KEYS_DIRECTORY \
-  ghcr.io/dasharo/dasharo-sdk:v1.1.0 \
+  ghcr.io/dasharo/dasharo-sdk:v1.1.2 \
   /vboot/scripts/image_signing/sign_firmware.sh \
   "$INPUT_ROM" \
   "$KEYS_DIRECTORY" \
