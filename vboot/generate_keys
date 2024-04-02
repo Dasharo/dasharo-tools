@@ -23,13 +23,21 @@ EOF
 }
 
 KEYS_DIRECTORY="$(readlink -f $1)"
+source "${SCRIPT_DIR}/env"
 
-[ -z "$KEYS_DIRECTORY" ] && echo "KEYS_DIRECTORY not given" && usage
+[ -z "${KEYS_DIRECTORY}" ] && echo "KEYS_DIRECTORY not given" && usage
 
-docker run --rm -it -v $PWD:$PWD -w $PWD \
-  ghcr.io/dasharo/dasharo-sdk:v1.1.0 \
-  /vboot/scripts/keygeneration/create_new_keys.sh --output "$KEYS_DIRECTORY"
+docker run --rm -v ${PWD}:${PWD} -w ${PWD} ${CONTAINER} \
+  /vboot/scripts/keygeneration/make_arv_root.sh "${KEYS_DIRECTORY}/arv_root"
+
+errorCheck "Failed to generate vboot ARV root key"
+
+docker run --rm -v ${PWD}:${PWD} -w ${PWD} ${CONTAINER} \
+  /vboot/scripts/keygeneration/create_new_keys.sh \
+    --8k-root --8k-recovery \
+    --arv-root-path "${KEYS_DIRECTORY}/arv_root" \
+    --output "${KEYS_DIRECTORY}/vboot"
 
 errorCheck "Failed to generate keys"
 
-echo "The Verified Boot keys were generated into following directory: $KEYS_DIRECTORY"
+echo "The Verified Boot keys were generated into following directory: ${KEYS_DIRECTORY}"

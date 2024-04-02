@@ -27,18 +27,18 @@ EOF
 INPUT_ROM="$(readlink -f $1)"
 KEYS_DIRECTORY="$(readlink -f $2)"
 OUTPUT_ROM="${INPUT_ROM%.*}_resigned.rom"
+source "${SCRIPT_DIR}/env"
 
-[ -z "$INPUT_ROM" ] && echo "INPUT_ROM not given" && usage
-[ -z "$KEYS_DIRECTORY" ] && echo "KEYS_DIRECTORY not given" && usage
+[ -z "${INPUT_ROM}" ] && echo "INPUT_ROM not given" && usage
+[ -z "${KEYS_DIRECTORY}" ] && echo "KEYS_DIRECTORY not given" && usage
 
-docker run --rm -v $PWD:$PWD -w $PWD \
-  -v $KEYS_DIRECTORY:$KEYS_DIRECTORY \
-  ghcr.io/dasharo/dasharo-sdk:v1.1.2 \
+docker run --rm -v ${PWD}:${PWD} -w ${PWD} \
+  -v ${KEYS_DIRECTORY}:${KEYS_DIRECTORY} ${CONTAINER} \
   /vboot/scripts/image_signing/sign_firmware.sh \
-  "$INPUT_ROM" \
-  "$KEYS_DIRECTORY" \
-  "$OUTPUT_ROM"
+  "${INPUT_ROM}" \
+  "${KEYS_DIRECTORY}/vboot" \
+  "${OUTPUT_ROM}"
 
 errorCheck "Failed to resign firmware file"
 
-echo "The $INPUT_ROM was resigned and saved as: $OUTPUT_ROM"
+echo "The ${INPUT_ROM} was resigned and saved as: ${OUTPUT_ROM}"
