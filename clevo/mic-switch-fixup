@@ -16,8 +16,11 @@ case "$PRODUCT_NAME" in
     ;;
 esac
 
-echo "evdev:atkbd:dmi:bvn*:bvr*:svn${MANUFACTURER}:pn${PRODUCT_NAME}:*" > "$HWDB_FILE"
-echo "        KEYBOARD_KEY_81=f20" >> "$HWDB_FILE"
+{
+  printf '\n'
+  echo "evdev:atkbd:dmi:bvn*:bvr*:svn${MANUFACTURER}:pn${PRODUCT_NAME}:*"
+  echo "        KEYBOARD_KEY_81=f20"
+} >> "$HWDB_FILE"
 
 systemd-hwdb update
 udevadm trigger
