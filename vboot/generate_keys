@@ -27,12 +27,12 @@ source "${SCRIPT_DIR}/env"
 
 [ -z "${KEYS_DIRECTORY}" ] && echo "KEYS_DIRECTORY not given" && usage
 
-docker run --rm -v ${PWD}:${PWD} -w ${PWD} ${CONTAINER} \
+docker run --rm --user $(id -u):$(id -g) -v ${PWD}:${PWD} -w ${PWD} ${CONTAINER} \
   /vboot/scripts/keygeneration/make_arv_root.sh "${KEYS_DIRECTORY}/arv_root"
 
 errorCheck "Failed to generate vboot ARV root key"
 
-docker run --rm -v ${PWD}:${PWD} -w ${PWD} ${CONTAINER} \
+docker run --rm --user $(id -u):$(id -g) -v ${PWD}:${PWD} -w ${PWD} ${CONTAINER} \
   /vboot/scripts/keygeneration/create_new_keys.sh \
     --8k-root --8k-recovery \
     --arv-root-path "${KEYS_DIRECTORY}/arv_root" \
