@@ -7,11 +7,11 @@ MANUFACTURER="$(dmidecode -s baseboard-manufacturer)"
 echo "Found $MANUFACTURER $PRODUCT_NAME"
 
 case "$PRODUCT_NAME" in
-  V5xTNC_TND_TNE|V54x_6x_TU|NV4xPZ)
+  V5xTNC_TND_TNE|V54x_6x_TU|NV4xPZ|NV4XMB,ME,MZ|NS50_70MU)
     :
     ;;
   *)
-    echo "Microphone switch only supported on V54x, V56x and NV4xPZ laptops"
+    echo "Microphone switch only supported on V54x, V56x, NV4x, NS5xMU and NS7xMU laptops"
     exit 1
     ;;
 esac
