@@ -32,7 +32,7 @@ source "${SCRIPT_DIR}/env"
 [ -z "${INPUT_ROM}" ] && echo "INPUT_ROM not given" && usage
 [ -z "${KEYS_DIRECTORY}" ] && echo "KEYS_DIRECTORY not given" && usage
 
-docker run --rm -v ${PWD}:${PWD} -w ${PWD} \
+docker run --rm --user $(id -u):$(id -g) -v ${PWD}:${PWD} -w ${PWD} \
   -v ${KEYS_DIRECTORY}:${KEYS_DIRECTORY} ${CONTAINER} \
   /vboot/scripts/image_signing/sign_firmware.sh \
   "${INPUT_ROM}" \
